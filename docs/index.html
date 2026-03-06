@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Research Integrity Analyzer</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f2f5;
+            color: #212529;
+            min-height: 100vh;
+        }
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+        }
+        .hero h1 { font-size: 2.5em; margin-bottom: 12px; }
+        .hero p { font-size: 1.15em; opacity: 0.9; max-width: 600px; margin: 0 auto 20px; }
+        .badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin: 4px;
+        }
+        .container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .card h2 {
+            font-size: 1.3em;
+            color: #495057;
+            margin-bottom: 18px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f2f5;
+        }
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-top: 10px;
+        }
+        .module-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+        .module-icon { font-size: 2em; margin-bottom: 10px; }
+        .module-card h3 { font-size: 1em; color: #495057; margin-bottom: 8px; }
+        .module-card p { font-size: 0.85em; color: #6c757d; line-height: 1.5; }
+        .outputs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        .output-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+            border-left: 4px solid #667eea;
+        }
+        .output-item h4 { color: #495057; margin-bottom: 6px; }
+        .output-item p { font-size: 0.85em; color: #6c757d; line-height: 1.5; }
+        .score-demo {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 16px;
+            padding: 20px 0;
+        }
+        .score-item { text-align: center; }
+        .score-circle {
+            width: 80px; height: 80px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4em; font-weight: bold; color: white;
+            margin: 0 auto 8px;
+        }
+        .score-label { font-size: 0.85em; color: #6c757d; }
+        .technique-list { list-style: none; }
+        .technique-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f2f5;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+        .technique-list li:last-child { border-bottom: none; }
+        .technique-number {
+            min-width: 28px; height: 28px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.8em; font-weight: bold;
+        }
+        .code-block {
+            background: #1e1e2e;
+            color: #cdd6f4;
+            border-radius: 8px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            line-height: 1.6;
+        }
+        .code-block .comment { color: #6c7086; }
+        .code-block .string { color: #a6e3a1; }
+        .code-block .keyword { color: #cba6f7; }
+        .cta-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+        .btn {
+            display: inline-block;
+            padding: 12px 28px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .btn-secondary { background: white; color: #667eea; border: 2px solid #667eea; }
+        .flag-example {
+            background: #fff8f0;
+            border-left: 4px solid #fd7e14;
+            padding: 12px 16px;
+            border-radius: 0 8px 8px 0;
+            margin: 8px 0;
+        }
+        .flag-example strong { color: #fd7e14; }
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: #6c757d;
+            font-size: 0.9em;
+            background: white;
+            border-top: 1px solid #e9ecef;
+        }
+        a { color: #667eea; }
+    </style>
+</head>
+<body>
+
+<div class="hero">
+    <div style="font-size:3em; margin-bottom:16px;">🔬</div>
+    <h1>AI Research Integrity Analyzer</h1>
+    <p>Automated detection of statistical anomalies, experimental design problems,
+       and reproducibility concerns in scientific research papers.</p>
+    <div>
+        <span class="badge">📊 Statistical Analysis</span>
+        <span class="badge">🧪 Design Validation</span>
+        <span class="badge">🔁 Reproducibility</span>
+        <span class="badge">📋 Auto Reports</span>
+    </div>
+    <div class="cta-buttons">
+        <a href="https://github.com/PranayMahendrakar/ai-research-integrity-analyzer" class="btn btn-primary">View on GitHub</a>
+        <a href="#how-it-works" class="btn btn-secondary" style="color:white; border-color:white;">How It Works</a>
+    </div>
+</div>
+
+<div class="container">
+
+    <!-- Score Overview -->
+    <div class="card">
+        <h2>📈 Credibility Score Components</h2>
+        <p style="color:#6c757d; margin-bottom:16px;">Each paper receives four dimension scores and an overall credibility score (0-100):</p>
+        <div class="score-demo">
+            <div class="score-item">
+                <div class="score-circle" style="background:linear-gradient(135deg,#667eea,#764ba2);">85</div>
+                <div class="score-label">Overall<br>Credibility</div>
+            </div>
+            <div class="score-item">
+                <div class="score-circle" style="background:#28a745;">92</div>
+                <div class="score-label">Statistical<br>(35%)</div>
+            </div>
+            <div class="score-item">
+                <div class="score-circle" style="background:#6fbf73;">80</div>
+                <div class="score-label">Design<br>(30%)</div>
+            </div>
+            <div class="score-item">
+                <div class="score-circle" style="background:#ffc107; color:#212529;">75</div>
+                <div class="score-label">Reproducibility<br>(20%)</div>
+            </div>
+            <div class="score-item">
+                <div class="score-circle" style="background:#28a745;">90</div>
+                <div class="score-label">Transparency<br>(15%)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modules -->
+    <div class="card" id="how-it-works">
+        <h2>🧩 System Modules</h2>
+        <div class="modules-grid">
+            <div class="module-card">
+                <div class="module-icon">📄</div>
+                <h3>paper_parser</h3>
+                <p>Extracts sections, statistical claims, figures, tables, citations, and metadata from paper text.</p>
+            </div>
+            <div class="module-card">
+                <div class="module-icon">📊</div>
+                <h3>statistical_checker</h3>
+                <p>Runs p-curve analysis, power calculations, impossible value detection, and CI validation.</p>
+            </div>
+            <div class="module-card">
+                <div class="module-icon">🧪</div>
+                <h3>experiment_validator</h3>
+                <p>Checks for controls, blinding, randomization, ethics approval, data/code availability.</p>
+            </div>
+            <div class="module-card">
+                <div class="module-icon">📋</div>
+                <h3>report_generator</h3>
+                <p>Produces HTML/JSON reports with scores, red flags, and reproducibility checklists.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analysis Techniques -->
+    <div class="card">
+        <h2>🔍 Analysis Techniques</h2>
+        <ul class="technique-list">
+            <li>
+                <div class="technique-number">1</div>
+                <div>
+                    <strong>P-Curve Analysis</strong><br>
+                    <span style="color:#6c757d;">Detects clustering of p-values just below the 0.05 threshold (0.040–0.050 range). High clustering ratios (&gt;50%) indicate potential p-hacking or selective reporting of marginally significant results.</span>
+                </div>
+            </li>
+            <li>
+                <div class="technique-number">2</div>
+                <div>
+                    <strong>Statistical Power Analysis</strong><br>
+                    <span style="color:#6c757d;">Estimates post-hoc power based on reported effect sizes and sample sizes using Cohen's formulas. Flags studies with estimated power below 80%, indicating insufficient sample sizes to reliably detect the claimed effects.</span>
+                </div>
+            </li>
+            <li>
+                <div class="technique-number">3</div>
+                <div>
+                    <strong>Impossible Value Detection</strong><br>
+                    <span style="color:#6c757d;">Identifies mathematically impossible statistics: p-values outside [0,1], correlations outside [-1,1], implausibly large effect sizes (d&gt;5), and inverted confidence intervals where lower &ge; upper bounds.</span>
+                </div>
+            </li>
+            <li>
+                <div class="technique-number">4</div>
+                <div>
+                    <strong>Methods Completeness Scoring</strong><br>
+                    <span style="color:#6c757d;">Evaluates 8 critical methodological elements: sample size justification, randomization, blinding, control conditions, inclusion/exclusion criteria, outcome pre-specification, analysis plans, and effect size reporting.</span>
+                </div>
+            </li>
+            <li>
+                <div class="technique-number">5</div>
+                <div>
+                    <strong>Reproducibility Checklist (TOP Guidelines)</strong><br>
+                    <span style="color:#6c757d;">Checks 5 reproducibility criteria: data availability, code availability, pre-registration, materials availability, and replication attempts. Aligned with Transparency and Openness Promotion (TOP) guidelines.</span>
+                </div>
+            </li>
+            <li>
+                <div class="technique-number">6</div>
+                <div>
+                    <strong>Ethics and Transparency Audit</strong><br>
+                    <span style="color:#6c757d;">Verifies presence of IRB/ethics approval, informed consent statements, conflict of interest disclosures, and funding acknowledgements — all required by major journal policies.</span>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Red Flags Examples -->
+    <div class="card">
+        <h2>🚩 Example Red Flags Detected</h2>
+        <div class="flag-example">
+            <strong>[CRITICAL]</strong> Correlation r = 1.23 is outside [-1, 1] — mathematically impossible. Check for transcription error.
+        </div>
+        <div class="flag-example" style="border-color:#dc3545; background:#fff5f5;">
+            <strong style="color:#dc3545;">[CRITICAL]</strong> P-value 1.4 exceeds 1.0 — mathematically impossible. Verify if this is a typographical error.
+        </div>
+        <div class="flag-example" style="border-color:#667eea; background:#f5f5ff;">
+            <strong style="color:#667eea;">[HIGH]</strong> 3/4 significant p-values cluster in range (0.040–0.050), indicating potential p-hacking.
+        </div>
+        <div class="flag-example" style="border-color:#6fbf73; background:#f5fff8;">
+            <strong style="color:#6fbf73;">[MEDIUM]</strong> No a priori power analysis found. With d=0.35 and n=15, estimated power is only 22%.
+        </div>
+    </div>
+
+    <!-- Outputs -->
+    <div class="card">
+        <h2>📤 Report Outputs</h2>
+        <div class="outputs-grid">
+            <div class="output-item">
+                <h4>🌐 HTML Report</h4>
+                <p>Interactive, color-coded report with score breakdown, issue cards, and reproducibility checklist.</p>
+            </div>
+            <div class="output-item">
+                <h4>📦 JSON Data</h4>
+                <p>Machine-readable report for API integration, batch analysis, and custom dashboards.</p>
+            </div>
+            <div class="output-item">
+                <h4>📝 Markdown Summary</h4>
+                <p>Concise summary for GitHub Issues, pull request reviews, or journal submission systems.</p>
+            </div>
+            <div class="output-item">
+                <h4>📊 GitHub Pages Index</h4>
+                <p>Aggregate index of all analyzed papers with scores, red flag counts, and direct links.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Start -->
+    <div class="card">
+        <h2>⚡ Quick Start</h2>
+        <div class="code-block">
+<span class="comment"># Clone the repository</span>
+git clone https://github.com/PranayMahendrakar/ai-research-integrity-analyzer
+cd ai-research-integrity-analyzer
+
+<span class="comment"># Run the demo analysis</span>
+python analyzer.py --demo
+
+<span class="comment"># Analyze your own paper</span>
+python analyzer.py --text my_paper.txt --output docs/
+
+<span class="comment"># Analyze from JSON</span>
+python analyzer.py --json paper_data.json --output docs/
+
+<span class="comment"># Batch analyze multiple papers</span>
+python analyzer.py --batch paper1.txt paper2.txt paper3.json
+        </div>
+    </div>
+
+    <!-- Analyzed Papers Table -->
+    <div class="card">
+        <h2>📚 Analyzed Papers</h2>
+        <p style="color:#6c757d; margin-bottom:16px;">Papers analyzed using this tool will appear here after running the analyzer.</p>
+        <table style="width:100%; border-collapse:collapse;">
+            <thead>
+                <tr style="background:#f8f9fa;">
+                    <th style="padding:10px; text-align:left; border-bottom:2px solid #dee2e6;">Paper Title</th>
+                    <th style="padding:10px; text-align:center; border-bottom:2px solid #dee2e6;">Score</th>
+                    <th style="padding:10px; text-align:center; border-bottom:2px solid #dee2e6;">Red Flags</th>
+                    <th style="padding:10px; text-align:center; border-bottom:2px solid #dee2e6;">Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="4" style="padding:20px; text-align:center; color:#6c757d;">
+                        No papers analyzed yet. Run <code>python analyzer.py --demo</code> to generate your first report.
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<footer>
+    <p>🔬 AI Research Integrity Analyzer &nbsp;|&nbsp;
+       <a href="https://github.com/PranayMahendrakar/ai-research-integrity-analyzer">GitHub Repository</a> &nbsp;|&nbsp;
+       Built for scientific rigor and research transparency
+    </p>
+</footer>
+
+</body>
+</html>
